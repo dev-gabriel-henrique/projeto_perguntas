@@ -1,23 +1,47 @@
 import 'package:flutter/material.dart';
 
-main() => runApp(PerguntaAPP());
+import './questao.dart';
+import './resposta.dart';
 
-class PerguntaAppState extends State<PerguntaAPP> {
-  var perguntaSelecionada = 0;
+void main() => runApp(const PerguntaAPP());
 
-  void responder() {
+class PerguntaAPP extends StatefulWidget {
+  const PerguntaAPP({super.key});
+
+  @override
+  State<PerguntaAPP> createState() => _PerguntaAppState();
+}
+
+class _PerguntaAppState extends State<PerguntaAPP> {
+  var _perguntaSelecionada = 0;
+
+  static const List<Map<String, Object>> _perguntas = [
+    {
+      'texto': 'Qual é a sua cor favorita?',
+      'respostas': ['Preto', 'Vermelho', 'Verde', 'Branco'],
+    },
+    {
+      'texto': 'Qual é o seu animal favorito?',
+      'respostas': ['Coelho', 'Cobra', 'Elefante', 'Leão'],
+    },
+    {
+      'texto': 'Qual é o seu instrutor favorito?',
+      'respostas': ['Maria', 'João', 'Leo', 'Pedro'],
+    },
+  ];
+
+  void _responder() {
     setState(() {
-      perguntaSelecionada++;
+      _perguntaSelecionada++;
     });
-    print(perguntaSelecionada);
+    debugPrint('Pergunta ${_perguntaSelecionada + 1} selecionada');
   }
+
+  bool get temPerguntaSelecionada => _perguntaSelecionada < _perguntas.length;
 
   @override
   Widget build(BuildContext context) {
-    final List<String> perguntas = [
-      'Qual é a sua cor favorita?',
-      'Qual é o seu animal favorito?',
-    ];
+    final respostas = temPerguntaSelecionada ? _perguntas[_perguntaSelecionada]['respostas'] as List<String> : [];
 
     return MaterialApp(
       home: Scaffold(
@@ -25,35 +49,20 @@ class PerguntaAppState extends State<PerguntaAPP> {
           title: const Text('Perguntas'),
           backgroundColor: Colors.blueAccent,
         ),
-        body: Column(
-          children: <Widget>[
-            Text(perguntas[perguntaSelecionada]),
-            ElevatedButton(
-              onPressed: responder,
-              child: Text('Resposta 1'),
-            ),
-            ElevatedButton(
-              child: const Text('Resposta 2'),
-              onPressed: () {
-                print('Resposta 2 foi selecionada!');
-              },
-            ),
-            ElevatedButton(
-              child: const Text('Resposta 3'),
-              onPressed: () => print('Resposta 3'),
-            ),
-          ],
-        ),
+        body: temPerguntaSelecionada
+            ? Column(
+                children: <Widget>[
+                  Questao(_perguntas[_perguntaSelecionada]['texto'] as String),
+                  ...respostas.map((resposta) => Resposta(resposta, _responder)),
+                ],
+              )
+            : const Center(
+                child: Text(
+                  'Parabéns!',
+                  style: TextStyle(fontSize: 28),
+                ),
+              ),
       ),
     );
-  }
-}
-
-class PerguntaAPP extends StatefulWidget {
-  const PerguntaAPP({super.key});
-
-  @override
-  State<PerguntaAPP> createState() {
-    return PerguntaAppState();
   }
 }
